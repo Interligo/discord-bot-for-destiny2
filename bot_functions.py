@@ -1,9 +1,11 @@
 import os
 import string
 import discord
+import random
 from fuzzywuzzy import process
 
 import bot_words_storage as st
+import image_parser as parser
 
 
 def word_lists_counter() -> int:
@@ -59,3 +61,15 @@ def bad_word_finder(message: discord.MessageType) -> str:
             result = found_word if rating > 75 else None
 
     return result
+
+
+def image_selection():
+    """Function to randomize image choice."""
+    start_of_link = 'http://babenki.info/'
+    image_links_list = parser.get_images()
+    image_count = len(image_links_list)
+    choice = random.randint(0, image_count)
+
+    link = start_of_link + image_links_list[choice]
+
+    return link

@@ -7,15 +7,15 @@ from discord.ext import commands
 from load_environment import load_environment
 from bot_functions import discord_message_analysis
 from bot_functions import bad_word_finder
+from bot_functions import image_selection
 
-# TODO: add logger
 
 load_environment()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 PREFIX = '!'
 
-bot = commands.Bot(command_prefix=PREFIX)
+bot = commands.Bot(command_prefix=PREFIX)  # intents=discord.Intents.all()
 bot.remove_command('help')
 
 
@@ -26,17 +26,25 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-    # TODO: с помощью рандома сделать три вида приветствий
-
     await member.send(f'Рад тебя видеть, {member.mention}, добро пожаловать! '
                       f'Можешь ознакомиться со списком доступных команд !help и обязательно прочти наши !rules. '
                       f'Мой баннхаммер не знает пощады!')
 
+    guest_role = discord.utils.get(member.guild.roles, name='Гость')
+    await member.add_roles(guest_role)
 
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(f'{ctx.author.mention}, команда не идентифицирована. Пожалуйста, введите корректную команду.')
+
+# TODO: убрать комментарии после отладки
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.CommandNotFound):
+#         await ctx.send(f'{ctx.author.mention}, команда не идентифицирована. Введите корректную команду.')
+#
+#     if isinstance(error, commands.MissingPermissions):
+#         await ctx.send(f'{ctx.author.mention}, низкий уровень доступа. В использовании команды отказано.')
+#
+#     if isinstance(error, commands.MissingRequiredArgument):
+#         await ctx.send(f'{ctx.author.mention}, команда введена неверно. Пропущен аргумент данной команды.')
 
 
 @bot.event
@@ -68,6 +76,7 @@ async def help(ctx):
     embed.set_author(name=bot.user.name, icon_url=bot.user.avatar_url)
     embed.add_field(name=f'{PREFIX}help', value='Выводит список команд.')
     embed.add_field(name=f'{PREFIX}rules', value='Выводит список правил сервера.')
+    embed.add_field(name=f'{PREFIX}boobs', value='Безмерно радует всех Сиськолюбов.')
     embed.add_field(name=f'{PREFIX}duel @target_name', value='Позволяет вызвать на дуэль и испытать удачу. '
                                                              'Проигравший отправляется в мут на 60 секунд.')
 
@@ -75,13 +84,13 @@ async def help(ctx):
 
 
 @bot.command()
-async def rules(ctx):  # TODO: залить мем "МОЖНО СКАЖУ?" на сервер и бот должен её скидывать при этой фразе
+async def rules(ctx):
     await ctx.channel.purge(limit=1)
 
     embed = discord.Embed(colour=discord.Color.gold(), title='Правила сервера:')
     embed.set_author(name=bot.user.name, icon_url=bot.user.avatar_url)
     embed.add_field(name='0.', value='Всегда уважай Великий Разум!', inline=True)
-    embed.add_field(name='1.', value='Это сервер друзей для друзей, будь дружелюбнее.', inline=True)
+    embed.add_field(name='1.', value='Мы здесь отдыхаем, поэтому будь дружелюбнее.', inline=True)
     embed.add_field(name='2.', value='Запрещено быть душным мудилой и говорить "можно скажу?" в голосовом чате.',
                     inline=True)
 
@@ -94,7 +103,7 @@ async def clear(ctx, amount_to_delete=2):
     await ctx.channel.purge(limit=amount_to_delete)
 
 
-@bot.command()
+@bot.command(aliases=['бан', 'заткнуть'])
 @commands.has_permissions(administrator=True)
 async def mute(ctx, member: discord.Member):
     await ctx.channel.purge(limit=1)
@@ -103,10 +112,11 @@ async def mute(ctx, member: discord.Member):
     await member.add_roles(mute_role)
 
     await ctx.send(f'Великий Разум пожелал, чтобы {member.mention} немного помолчал.')
-    await member.send(f'Фреймы призваны защищать и помогать людям, поэтому я здесь. Тебя забанил {ctx.author.name}.')
+    await member.send(f'Фреймы призваны помогать людям, поэтому я здесь. Тебя забанил {ctx.author.name}. '
+                      f'Причина мне неизвестна, однако Великий Разум обратил на тебя своё внимание, это такая честь!')
 
 
-@bot.command()
+@bot.command(aliases=['разбан', 'пощадить'])
 @commands.has_permissions(administrator=True)
 async def unmute(ctx, member: discord.Member):
     await ctx.channel.purge(limit=1)
@@ -153,13 +163,14 @@ async def duel(ctx, member: discord.Member):
     await ctx.send(f'Призрак в очередной раз вдохнул жизнь в {loser}.')
 
 
-@bot.command()
-async def status(ctx, member: discord.Member):
+@bot.command(aliases=['сиськи', 'красота'])
+async def boobs(ctx):
     await ctx.channel.purge(limit=1)
 
-    await ctx.send(f'Name = {member.name}, Status = {member.desktop_status}, Role = {member.top_role}')
+    image = image_selection()
 
-# Команда '!boobs' - загружает из интернета рандомную фотку сисек и постит её в дискорд-чате.
+    await ctx.send(image)
+    await ctx.send(f'{ctx.author.name} решил порадовать друзей.')
 
 
 bot.run(BOT_TOKEN)
