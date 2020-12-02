@@ -13,7 +13,7 @@ def get_images():
     image_list = []
 
     if response.status_code == 200:
-        soup = bs(response.content, "lxml")
+        soup = bs(response.content, 'lxml')
         photos = soup.find_all('a')
 
         for photo in photos:

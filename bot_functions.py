@@ -29,8 +29,8 @@ def word_lists_counter() -> int:
 def discord_message_analysis(message: discord.MessageType) -> str:
     """Function to for processing words to get they meaning."""
     word_lists_number = word_lists_counter()
-    referring_to_word_lists = [st.hello_words_list, st.bad_words_list, st.help_words_list]
-    callback_from_word_lists = ['hello', 'bad', 'help']
+    referring_to_word_lists = [st.hello_words_list, st.by_words_list, st.bad_words_list, st.help_words_list]
+    callback_from_word_lists = ['hello', 'by', 'bad', 'help']
     result = None
 
     message_content = message.content.lower()
@@ -63,7 +63,7 @@ def bad_word_finder(message: discord.MessageType) -> str:
     return result
 
 
-def image_selection():
+def image_selection() -> str:
     """Function to randomize image choice."""
     start_of_link = 'http://babenki.info/'
     image_links_list = parser.get_images()

@@ -1,4 +1,5 @@
 import os
+import asyncio
 import time
 import random
 import discord
@@ -8,10 +9,13 @@ from load_environment import load_environment
 from bot_functions import discord_message_analysis
 from bot_functions import bad_word_finder
 from bot_functions import image_selection
+from xur_destiny2 import is_xur_here
+from xur_destiny2 import get_xur_location
 
 
 load_environment()
 
+CHANNEL_ID = os.getenv('CHANNEL_ID')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 PREFIX = '!'
 
@@ -34,17 +38,16 @@ async def on_member_join(member):
     await member.add_roles(guest_role)
 
 
-# TODO: убрать комментарии после отладки
-# @bot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.CommandNotFound):
-#         await ctx.send(f'{ctx.author.mention}, команда не идентифицирована. Введите корректную команду.')
-#
-#     if isinstance(error, commands.MissingPermissions):
-#         await ctx.send(f'{ctx.author.mention}, низкий уровень доступа. В использовании команды отказано.')
-#
-#     if isinstance(error, commands.MissingRequiredArgument):
-#         await ctx.send(f'{ctx.author.mention}, команда введена неверно. Пропущен аргумент данной команды.')
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(f'{ctx.author.mention}, команда не идентифицирована. Введите корректную команду.')
+
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send(f'{ctx.author.mention}, низкий уровень доступа. В использовании команды отказано.')
+
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(f'{ctx.author.mention}, команда введена неверно. Пропущен аргумент данной команды.')
 
 
 @bot.event
@@ -59,11 +62,14 @@ async def on_message(message):
 
         if result == 'hello':
             await message.channel.send(f'{message_author.mention}, привет!')
+        elif result == 'by':
+            await message.channel.send(f'До скорого, {message_author.mention}!')
         elif result == 'bad':
             bad_word = bad_word_finder(message)
             await message.channel.send(f'Так ты сам, {message_author.mention}, {bad_word} получается.')
         elif result == 'help':
-            await message.channel.send(f'{message_author.mention}, придется подождать... Help скоро будет закончен.')
+            await message.channel.send(f'{message_author.mention}, хочешь узнать список команд? '
+                                       f'Напиши !help в чат.')
 
     await bot.process_commands(message)
 
@@ -103,7 +109,7 @@ async def clear(ctx, amount_to_delete=2):
     await ctx.channel.purge(limit=amount_to_delete)
 
 
-@bot.command(aliases=['бан', 'заткнуть'])
+@bot.command(aliases=['бан'])
 @commands.has_permissions(administrator=True)
 async def mute(ctx, member: discord.Member):
     await ctx.channel.purge(limit=1)
@@ -116,7 +122,7 @@ async def mute(ctx, member: discord.Member):
                       f'Причина мне неизвестна, однако Великий Разум обратил на тебя своё внимание, это такая честь!')
 
 
-@bot.command(aliases=['разбан', 'пощадить'])
+@bot.command(aliases=['разбан'])
 @commands.has_permissions(administrator=True)
 async def unmute(ctx, member: discord.Member):
     await ctx.channel.purge(limit=1)
@@ -163,7 +169,7 @@ async def duel(ctx, member: discord.Member):
     await ctx.send(f'Призрак в очередной раз вдохнул жизнь в {loser}.')
 
 
-@bot.command(aliases=['сиськи', 'красота'])
+@bot.command(aliases=['сиськи'])
 async def boobs(ctx):
     await ctx.channel.purge(limit=1)
 
@@ -173,4 +179,33 @@ async def boobs(ctx):
     await ctx.send(f'{ctx.author.name} решил порадовать друзей.')
 
 
-bot.run(BOT_TOKEN)
+@bot.command(aliases=['зур', 'Зур'])
+async def xur(ctx):
+    await ctx.channel.purge(limit=1)
+
+    xur_location = get_xur_location()
+
+    await ctx.send(f'{ctx.author.mention} {xur_location}')
+
+
+async def is_xur_arrived():
+    await bot.wait_until_ready()
+    channel = bot.get_channel(int(CHANNEL_ID))
+    message_sent = False
+
+    while True:
+        if is_xur_here():
+            if not message_sent:
+                xur_location = get_xur_location()
+                await channel.send(f'{xur_location}')
+                message_sent = True
+        if not is_xur_here():
+            message_sent = False
+
+        await asyncio.sleep(6 * 60 * 60)
+
+
+if __name__ == '__main__':
+    bot.loop.create_task(is_xur_arrived())
+
+    bot.run(BOT_TOKEN)
