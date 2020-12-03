@@ -19,7 +19,7 @@ CHANNEL_ID = os.getenv('CHANNEL_ID')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 PREFIX = '!'
 
-bot = commands.Bot(command_prefix=PREFIX)  # intents=discord.Intents.all()
+bot = commands.Bot(command_prefix=PREFIX)
 bot.remove_command('help')
 
 
@@ -169,7 +169,7 @@ async def duel(ctx, member: discord.Member):
     await ctx.send(f'Призрак в очередной раз вдохнул жизнь в {loser}.')
 
 
-@bot.command(aliases=['сиськи'])
+@bot.command(aliases=['сиськи', 'Сиськи'])
 async def boobs(ctx):
     await ctx.channel.purge(limit=1)
 
@@ -206,6 +206,6 @@ async def is_xur_arrived():
 
 
 if __name__ == '__main__':
-    bot.loop.create_task(is_xur_arrived())
-
     bot.run(BOT_TOKEN)
+
+    bot.loop.create_task(is_xur_arrived())
