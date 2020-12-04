@@ -1,3 +1,1 @@
-web: python bot_main.py
-
--Dplay.evolutions.db.default.autoApplyDowns=true
+worker: python bot_main.py
