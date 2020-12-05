@@ -1,6 +1,5 @@
 import os
 import asyncio
-import time
 import random
 import discord
 from discord.ext import commands
@@ -25,6 +24,9 @@ bot.remove_command('help')
 
 @bot.event
 async def on_ready():
+    channel = bot.get_channel(int(CHANNEL_ID))
+    await channel.send(f'{bot.user.name} в сети.')
+
     print(f'{bot.user.name} в сети.')
 
 
@@ -159,11 +161,11 @@ async def duel(ctx, member: discord.Member):
 
     if loser == duelist2:
         await member.add_roles(mute_role)
-        time.sleep(60)
+        await asyncio.sleep(60)
         await member.remove_roles(mute_role)
     else:
         await ctx.author.add_roles(mute_role)
-        time.sleep(60)
+        await asyncio.sleep(60)
         await ctx.author.remove_roles(mute_role)
 
     await ctx.send(f'Призрак в очередной раз вдохнул жизнь в {loser}.')
@@ -202,10 +204,10 @@ async def is_xur_arrived():
         if not is_xur_here():
             message_sent = False
 
-        await asyncio.sleep(6 * 60 * 60)
+        await asyncio.sleep(60 * 60)
 
 
 if __name__ == '__main__':
-    bot.run(BOT_TOKEN)
-
     bot.loop.create_task(is_xur_arrived())
+
+    bot.run(BOT_TOKEN)

@@ -42,7 +42,7 @@ def discord_message_analysis(message: discord.MessageType) -> str:
         for iteration in range(word_lists_number):
             if result is None:
                 found_word, rating = process.extractOne(word, referring_to_word_lists[iteration])
-                result = callback_from_word_lists[iteration] if rating > 75 else None
+                result = callback_from_word_lists[iteration] if rating > 85 else None
 
     return result
 
