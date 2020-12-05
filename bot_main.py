@@ -207,15 +207,7 @@ async def is_xur_arrived():
         await asyncio.sleep(60 * 60)
 
 
-<<<<<<< HEAD
 if __name__ == '__main__':
     bot.loop.create_task(is_xur_arrived())
 
     bot.run(BOT_TOKEN)
-=======
-if __name__ == '__main__':    
-    bot.run(BOT_TOKEN)
-    
-    bot.loop.create_task(is_xur_arrived())
-    
->>>>>>> 0d4173dec45a4df51d39883bacd4e647cded9aa9
