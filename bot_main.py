@@ -24,9 +24,6 @@ bot.remove_command('help')
 
 @bot.event
 async def on_ready():
-    channel = bot.get_channel(int(CHANNEL_ID))
-    await channel.send(f'{bot.user.name} в сети.')
-
     print(f'{bot.user.name} в сети.')
 
 
@@ -208,6 +205,6 @@ async def is_xur_arrived():
 
 
 if __name__ == '__main__':
-    bot.loop.create_task(is_xur_arrived())
+    # bot.loop.create_task(is_xur_arrived())
 
     bot.run(BOT_TOKEN)
