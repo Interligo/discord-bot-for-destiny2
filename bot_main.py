@@ -205,6 +205,6 @@ async def is_xur_arrived():
 
 
 if __name__ == '__main__':
-    # bot.loop.create_task(is_xur_arrived())
+    bot.loop.create_task(is_xur_arrived())
 
     bot.run(BOT_TOKEN)
